@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../core/constants.dart';
 import '../widgets/custom_button.dart';
-import 'package:flutter/services.dart';
+import 'package:qr_ksa/screens/home_screen.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -31,32 +32,24 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   void dispose() {
-    for (final c in _controllers) {
-      c.dispose();
-    }
-    for (final f in _focusNodes) {
-      f.dispose();
-    }
+    for (final c in _controllers) c.dispose();
+    for (final f in _focusNodes) f.dispose();
     super.dispose();
   }
 
-  String get otp => _controllers.map((controller) => controller.text).join();
+  String get otp => _controllers.map((c) => c.text).join();
 
   void _onChanged(int idx, String value) {
-    if (value.isNotEmpty && !RegExp(r'^\d$').hasMatch(value)) {
+    if (value.isNotEmpty && !RegExp(r'^\d\$').hasMatch(value)) {
       _controllers[idx].clear();
       return;
     }
-    // لصق الكود دفعة واحدة (6 أرقام)
     if (value.length > 1 && value.length == 6) {
-      for (var i = 0; i < 6; i++) {
-        _controllers[i].text = value[i];
-      }
+      for (var i = 0; i < 6; i++) _controllers[i].text = value[i];
       FocusScope.of(context).unfocus();
       setState(() {});
       return;
     }
-    // التنقل بين الحقول تلقائياً
     if (value.length == 1 && idx < 5) {
       _focusNodes[idx + 1].requestFocus();
     }
@@ -64,42 +57,22 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _handleKeyEvent(int idx, RawKeyEvent event) {
-    // ignore: avoid_print
     if (event is RawKeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.backspace) {
-      // إذا الحقل الحالي فاضي نرجع للي قبله ونفرغه
       if (_controllers[idx].text.isEmpty && idx > 0) {
         _focusNodes[idx - 1].requestFocus();
         _controllers[idx - 1].clear();
-        setState(() {});
       }
     }
   }
 
   void _verifyOtp() {
-    if (otp.length != 6 || otp.contains('')) {
-      setState(() => errorText = 'أدخل جميع الأرقام الستة من رمز التحقق');
-      return;
-    }
-    setState(() {
-      isLoading = true;
-      errorText = null;
-    });
-    FocusScope.of(context).unfocus();
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() => isLoading = false);
-      if (widget.onVerify != null) {
-        widget.onVerify!(otp);
-      } else {
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    });
+    // Navigate directly to HomeScreen
+    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
 
   void _clearAll() {
-    for (final c in _controllers) {
-      c.clear();
-    }
+    for (final c in _controllers) c.clear();
     _focusNodes[0].requestFocus();
     setState(() {});
   }
@@ -211,17 +184,6 @@ class _OtpScreenState extends State<OtpScreen> {
                               ),
                             ),
                             onChanged: (val) => _onChanged(idx, val),
-                            onTap: () =>
-                                _controllers[idx].selection = TextSelection(
-                                  baseOffset: 0,
-                                  extentOffset: _controllers[idx].text.length,
-                                ),
-                            onSubmitted: (val) {
-                              if (idx == 5) {
-                                FocusScope.of(context).unfocus();
-                                _verifyOtp();
-                              }
-                            },
                           ),
                         ),
                       ),
@@ -230,66 +192,23 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              if (errorText != null)
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(7),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.error, color: Colors.red[700], size: 18),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          errorText!,
-                          style: TextStyle(
-                            color: Colors.red[700],
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              const SizedBox(height: 14),
-              isLoading
-                  ? const CircularProgressIndicator(color: AppColors.primary)
-                  : CustomButton(label: 'تحقق', onPressed: _verifyOtp),
+              CustomButton(label: 'تحقق', onPressed: _verifyOtp),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: TextButton.icon(
-                  icon: const Icon(
-                    Icons.refresh,
-                    color: AppColors.accent,
-                    size: 21,
-                  ),
-                  label: Text(
-                    'إعادة إرسال الرمز',
-                    style: TextStyle(
-                      color: AppColors.accent,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 17,
-                    ),
-                  ),
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: AppColors.accent,
-                  ),
-                  onPressed: _resendCode,
+              TextButton.icon(
+                icon: const Icon(
+                  Icons.refresh,
+                  color: AppColors.accent,
+                  size: 21,
                 ),
+                label: Text(
+                  'إعادة إرسال الرمز',
+                  style: TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 17,
+                  ),
+                ),
+                onPressed: _resendCode,
               ),
               const SizedBox(height: 8),
               TextButton(

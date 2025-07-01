@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'دعوة QR',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Tajawal',
+        fontFamily: 'Rubik+',
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         primaryColor: Colors.black,
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/', // يبدأ من السبلاش
+      initialRoute: '/', // Start with signup screen
       onGenerateRoute: AppRouter.generateRoute,
     );
   }

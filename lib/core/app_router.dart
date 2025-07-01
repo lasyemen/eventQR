@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_ksa/screens/event_security_screen.dart';
+import 'package:qr_ksa/screens/home_screen.dart';
 import 'package:qr_ksa/screens/login_event_security_screen.dart';
 import 'package:qr_ksa/screens/otp_screen.dart';
 import 'package:qr_ksa/screens/scan_qr_screen.dart';
@@ -8,7 +9,7 @@ import 'package:qr_ksa/screens/scan_qr_screen.dart';
 import 'package:qr_ksa/screens/splash_screen.dart';
 import 'package:qr_ksa/screens/welcome_screen.dart';
 import 'package:qr_ksa/screens/login_screen.dart';
-//import 'package:qr_ksa/screens/signup_screen.dart';
+import 'package:qr_ksa/screens/signup_screen.dart';
 //import 'package:qr_ksa/screens/home_screen.dart';
 //import 'package:qr_ksa/screens/create_event_screen.dart';
 //import 'package:qr_ksa/screens/add_attendees_screen.dart';
@@ -33,21 +34,9 @@ class AppRouter {
       case '/login':
         return MaterialPageRoute(builder: (_) => const LoginScreen());
       case '/signup':
-        /*   return MaterialPageRoute(builder: (_) => const SignupScreen());
+        return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case '/home':
         return MaterialPageRoute(builder: (_) => const HomeScreen());
-      case '/create-event':
-        return MaterialPageRoute(builder: (_) => const CreateEventScreen());
-      case '/add-attendees':
-        return MaterialPageRoute(builder: (_) => const AddAttendeesScreen());
-      case '/payment':
-        return MaterialPageRoute(builder: (_) => const PaymentScreen());
-      case '/payment-success':
-        return MaterialPageRoute(builder: (_) => const PaymentSuccessScreen());
-      case '/qr-cards':
-        return MaterialPageRoute(builder: (_) => const QrCardsScreen());
-      case '/event-security':*/
-        return MaterialPageRoute(builder: (_) => const EventSecurityScreen());
       case '/scan-qr':
         return MaterialPageRoute(builder: (_) => const ScanQRScreen());
       case '/profile': /*
