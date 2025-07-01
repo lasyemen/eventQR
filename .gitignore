@@ -17,6 +17,8 @@
 /android/local.properties
 **/*.iml
 **/gradle-wrapper.jar
+/android/.kotlin/
+
 
 # iOS
 /ios/Pods/
