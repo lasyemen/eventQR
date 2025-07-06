@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'دعوة QR',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Rubik+',
+        fontFamily: 'Rubik',
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         primaryColor: Colors.black,
