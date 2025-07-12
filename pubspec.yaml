@@ -1,9 +1,6 @@
 name: qr_ksa
-
 description: "A new Flutter project."
-
 publish_to: "none"
-
 version: 1.0.0+1
 
 environment:
@@ -18,11 +15,22 @@ dependencies:
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
   font_awesome_flutter: ^10.8.0
-
+  file_picker: ^10.2.0
+  permission_handler: ^12.0.1
+  url_launcher: ^6.2.6
+  open_app_settings: ^2.0.1
+  contacts_service: ^0.6.3
+  provider: ^6.0.5
+  flutter_contacts: 1.1.9+2
+  intl: ^0.20.2
+  flutter_localizations:
+    sdk: flutter
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
@@ -31,9 +39,16 @@ flutter:
     - assets/images/riyadh1.png
     - assets/images/riyadh2.png
     - assets/images/riyadh3.png
+    - assets/images/icon.png
 
   fonts:
     - family: Rubik
       fonts:
         - asset: assets/fonts/Rubik-Bold.ttf
           weight: 400
+
+# إعدادات أيقونة التطبيق
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.png"
