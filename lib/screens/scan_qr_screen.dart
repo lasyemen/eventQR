@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ScanQRScreen extends StatefulWidget {
   const ScanQRScreen({Key? key}) : super(key: key);
@@ -13,6 +14,29 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
   QRViewController? controller;
   String? scanResult;
   bool isProcessing = false;
+  bool _cameraGranted = false;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestCameraPermission();
+  }
+
+  Future<void> _requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (status.isGranted) {
+      setState(() {
+        _cameraGranted = true;
+        _loading = false;
+      });
+    } else {
+      setState(() {
+        _cameraGranted = false;
+        _loading = false;
+      });
+    }
+  }
 
   @override
   void reassemble() {
@@ -36,7 +60,6 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
       setState(() => isProcessing = true);
       setState(() => scanResult = scanData.code);
 
-      // يمكنك هنا ربط التحقق بقاعدة بيانات أو خدمة
       await showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -60,6 +83,40 @@ class _ScanQRScreenState extends State<ScanQRScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (!_cameraGranted) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('مسح رمز QR'), centerTitle: true),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.camera_alt, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              const Text(
+                'الكاميرا غير مفعلة!',
+                style: TextStyle(fontSize: 18, color: Colors.red),
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton.icon(
+                onPressed: _requestCameraPermission,
+                icon: const Icon(Icons.refresh),
+                label: const Text('إعادة طلب الصلاحية'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade100,
+                  foregroundColor: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    // الكاميرا مفعلة - اعرض QRView مباشرة
     return Scaffold(
       appBar: AppBar(title: const Text('مسح رمز QR'), centerTitle: true),
       body: Column(

@@ -16,58 +16,54 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final List<TextEditingController> _controllers = List.generate(
-    6,
-    (_) => TextEditingController(),
-  );
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  bool isLoading = false;
-  String? errorText;
+  final int length = 6;
+  late final List<TextEditingController> _controllers;
+  late final List<FocusNode> _focusNodes;
+  late final List<FocusNode> _listenerFocusNodes; // الجـديد هنا
 
   @override
   void initState() {
     super.initState();
-    _focusNodes[0].requestFocus();
+    _controllers = List.generate(length, (_) => TextEditingController());
+    _focusNodes = List.generate(length, (_) => FocusNode());
+    _listenerFocusNodes = List.generate(
+      length,
+      (_) => FocusNode(),
+    ); // الجـديد هنا
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNodes[0].requestFocus();
+    });
   }
 
   @override
   void dispose() {
     for (final c in _controllers) c.dispose();
     for (final f in _focusNodes) f.dispose();
+    for (final f in _listenerFocusNodes) f.dispose(); // الجـديد هنا
     super.dispose();
   }
 
   String get otp => _controllers.map((c) => c.text).join();
 
   void _onChanged(int idx, String value) {
-    if (value.isNotEmpty && !RegExp(r'^\d\$').hasMatch(value)) {
-      _controllers[idx].clear();
-      return;
-    }
-    if (value.length > 1 && value.length == 6) {
-      for (var i = 0; i < 6; i++) _controllers[i].text = value[i];
+    if (value.length > 1) {
+      String clean = value.replaceAll(RegExp(r'[^0-9]'), '');
+      for (int i = 0; i < length; i++) {
+        _controllers[i].text = i < clean.length ? clean[i] : '';
+      }
       FocusScope.of(context).unfocus();
       setState(() {});
       return;
     }
-    if (value.length == 1 && idx < 5) {
+    if (value.isNotEmpty && idx < length - 1) {
       _focusNodes[idx + 1].requestFocus();
+    } else if (value.isEmpty && idx > 0) {
+      _focusNodes[idx - 1].requestFocus();
     }
     setState(() {});
   }
 
-  void _handleKeyEvent(int idx, RawKeyEvent event) {
-    if (event is RawKeyDownEvent &&
-        event.logicalKey == LogicalKeyboardKey.backspace) {
-      if (_controllers[idx].text.isEmpty && idx > 0) {
-        _focusNodes[idx - 1].requestFocus();
-        _controllers[idx - 1].clear();
-      }
-    }
-  }
-
   void _verifyOtp() {
-    // Navigate directly to HomeScreen
     Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
 
@@ -89,17 +85,9 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final otpBoxWidth = screenWidth > 420
-        ? 52.0
-        : screenWidth > 360
-        ? 45.0
-        : 37.0;
-    final otpBoxSpace = screenWidth > 420
-        ? 12.0
-        : screenWidth > 360
-        ? 8.0
-        : 6.0;
+    final theme = Theme.of(context);
+    final Color softBox = AppColors.primary.withOpacity(0.06);
+    final Color borderSoft = AppColors.primary.withOpacity(0.16);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -113,113 +101,148 @@ class _OtpScreenState extends State<OtpScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: AppColors.primary),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.lock, size: 54, color: AppColors.primary),
-              const SizedBox(height: 14),
-              Text(
-                'أدخل رمز التحقق المرسل إلى',
-                style: TextStyle(fontSize: 18, color: AppColors.text),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 7),
-              Text(
-                widget.phoneNumber,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 28),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.lock_outline_rounded,
+                  size: 54,
                   color: AppColors.primary,
                 ),
-              ),
-              const SizedBox(height: 26),
-              Directionality(
-                textDirection: TextDirection.ltr,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(6, (idx) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: otpBoxSpace / 2,
-                      ),
-                      child: SizedBox(
-                        width: otpBoxWidth,
-                        child: RawKeyboardListener(
-                          focusNode: FocusNode(),
-                          onKey: (event) => _handleKeyEvent(idx, event),
-                          child: TextField(
-                            controller: _controllers[idx],
-                            focusNode: _focusNodes[idx],
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            style: const TextStyle(
-                              fontSize: 27,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.primary,
-                            ),
-                            decoration: InputDecoration(
-                              counterText: '',
-                              filled: true,
-                              fillColor: AppColors.inputFill,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 13,
-                              ),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(13),
-                                borderSide: BorderSide(
-                                  color: AppColors.border,
-                                  width: 1.1,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(13),
-                                borderSide: BorderSide(
-                                  color: AppColors.primary,
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            onChanged: (val) => _onChanged(idx, val),
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
+                const SizedBox(height: 18),
+                Text(
+                  'أدخل رمز التحقق المرسل إلى',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.text,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 18),
-              CustomButton(label: 'تحقق', onPressed: _verifyOtp),
-              const SizedBox(height: 20),
-              TextButton.icon(
-                icon: const Icon(
-                  Icons.refresh,
-                  color: AppColors.accent,
-                  size: 21,
-                ),
-                label: Text(
-                  'إعادة إرسال الرمز',
-                  style: TextStyle(
-                    color: AppColors.accent,
+                const SizedBox(height: 8),
+                Text(
+                  widget.phoneNumber,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 17,
+                    color: AppColors.primary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 34),
+                SizedBox(
+                  height: 65,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(length, (idx) {
+                        final isFocused = _focusNodes[idx].hasFocus;
+                        return AnimatedContainer(
+                          duration: const Duration(milliseconds: 210),
+                          margin: const EdgeInsets.symmetric(horizontal: 6),
+                          width: 50,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: softBox,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: isFocused ? AppColors.primary : borderSoft,
+                              width: isFocused ? 1.7 : 1.1,
+                            ),
+                            boxShadow: [
+                              if (isFocused)
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.10),
+                                  blurRadius: 13,
+                                  spreadRadius: 0.4,
+                                  offset: const Offset(0, 4),
+                                ),
+                            ],
+                          ),
+                          child: Center(
+                            child: RawKeyboardListener(
+                              focusNode: _listenerFocusNodes[idx], // الجديد هنا
+                              onKey: (RawKeyEvent event) {
+                                if (event is RawKeyDownEvent &&
+                                    event.logicalKey ==
+                                        LogicalKeyboardKey.backspace &&
+                                    _controllers[idx].text.isEmpty &&
+                                    idx > 0) {
+                                  _focusNodes[idx - 1].requestFocus();
+                                  _controllers[idx - 1].clear();
+                                  setState(() {});
+                                }
+                              },
+                              child: TextField(
+                                controller: _controllers[idx],
+                                focusNode: _focusNodes[idx],
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.primary,
+                                  letterSpacing: 1,
+                                  fontFamily: 'Tajawal',
+                                ),
+                                keyboardType: TextInputType.number,
+                                maxLength: 1,
+                                showCursor: true,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  counterText: '',
+                                  contentPadding: EdgeInsets.zero,
+                                  fillColor: Colors.transparent,
+                                  filled: true,
+                                ),
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onChanged: (val) => _onChanged(idx, val),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+                    ),
                   ),
                 ),
-                onPressed: _resendCode,
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: _clearAll,
-                child: Text(
-                  'مسح الكل',
-                  style: TextStyle(color: AppColors.border, fontSize: 15),
+                const SizedBox(height: 28),
+                CustomButton(
+                  label: 'تحقق',
+                  onPressed: otp.length == length ? _verifyOtp : () {},
+                  icon: Icons.verified,
                 ),
-              ),
-              const SizedBox(height: 8),
-            ],
+                const SizedBox(height: 20),
+                TextButton.icon(
+                  icon: const Icon(
+                    Icons.refresh,
+                    color: AppColors.accent,
+                    size: 21,
+                  ),
+                  label: Text(
+                    'إعادة إرسال الرمز',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  onPressed: _resendCode,
+                ),
+                TextButton(
+                  onPressed: _clearAll,
+                  child: Text(
+                    'مسح الكل',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: const Color.fromARGB(255, 52, 55, 57),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

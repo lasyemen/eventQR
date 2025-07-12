@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // Add this
 import 'core/app_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('ar_SA', null);
   runApp(const MyApp());
 }
 
@@ -14,7 +18,7 @@ class MyApp extends StatelessWidget {
       title: 'دعوة QR',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: 'Rubik+',
+        fontFamily: 'Rubik',
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
         primaryColor: Colors.black,
@@ -31,14 +35,28 @@ class MyApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.grey[100],
-          border: OutlineInputBorder(
+          border: const OutlineInputBorder(
             borderRadius: BorderRadius.all(Radius.circular(14)),
-            borderSide: const BorderSide(color: Colors.black12),
+            borderSide: BorderSide(color: Colors.black12),
           ),
         ),
       ),
-      initialRoute: '/', // Start with signup screen
+      initialRoute: '/',
       onGenerateRoute: AppRouter.generateRoute,
+
+      // Add these critical localization properties:
+      locale: const Locale('ar', 'SA'),
+      supportedLocales: const [Locale('ar', 'SA')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      // Force RTL for the entire app
+      builder: (context, child) {
+        return Directionality(textDirection: TextDirection.rtl, child: child!);
+      },
     );
   }
 }

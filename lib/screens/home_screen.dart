@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:qr_ksa/screens/create_event.dart';
-import '../core/constants.dart'; // uses AppColors.primaryGradient and AppColors.primary
+import '../core/constants.dart'; // for AppColors.primaryGradient, etc.
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-// Screen to display all user events with same styling as HomeScreen
 class MyEventsScreen extends StatelessWidget {
   final List<Map<String, String>> events;
   const MyEventsScreen({Key? key, required this.events}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // use shared gradient from core
     final Gradient mainGradient = AppColors.primaryGradient;
 
     return Scaffold(
@@ -106,7 +103,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // use shared gradient from core
     final Gradient mainGradient = AppColors.primaryGradient;
 
     return Directionality(
@@ -120,7 +116,6 @@ class HomeScreen extends StatelessWidget {
           title: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // QR icon tinted by gradient
               ShaderMask(
                 shaderCallback: (bounds) => mainGradient.createShader(
                   Rect.fromLTWH(0, 0, bounds.width, bounds.height),
@@ -133,7 +128,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Greeting text tinted by gradient
               ShaderMask(
                 shaderCallback: (bounds) => mainGradient.createShader(
                   Rect.fromLTWH(0, 0, bounds.width, bounds.height),
@@ -186,7 +180,6 @@ class HomeScreen extends StatelessWidget {
                         fit: StackFit.expand,
                         children: [
                           Image.asset(e['imageUrl']!, fit: BoxFit.cover),
-                          // dark overlay gradient
                           Container(
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -235,7 +228,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               Row(
-                textDirection: TextDirection.rtl, // ← change here
+                textDirection: TextDirection.rtl,
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
@@ -267,7 +260,6 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-
               const SizedBox(height: 8),
               ListView.builder(
                 shrinkWrap: true,
@@ -324,7 +316,7 @@ class HomeScreen extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 16),
-              // Create event section with white background and original gradient shadow
+              // زر إنشاء فعالية جديدة
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 16),
                 padding: const EdgeInsets.all(16),
@@ -338,7 +330,7 @@ class HomeScreen extends StatelessWidget {
                       offset: const Offset(-2, -2),
                     ),
                     BoxShadow(
-                      color: mainGradient.colors[3].withOpacity(0.5),
+                      color: mainGradient.colors.last.withOpacity(0.5),
                       blurRadius: 6,
                       offset: const Offset(2, 2),
                     ),
@@ -386,7 +378,7 @@ class HomeScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                           onTap: () => Navigator.pushNamed(
                             context,
-                            CreateEventScreen.routeName,
+                            '/create-event', // استخدم اسم الراوت بالضبط هنا
                           ),
                           child: const Padding(
                             padding: EdgeInsets.all(12),

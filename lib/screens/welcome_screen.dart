@@ -16,11 +16,18 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // لوجو أو أيقونة QR
+                // لوجو أو أيقونة QR بتدرج لوني
                 Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppColors.primary,
+                    gradient: AppColors.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.18),
+                        blurRadius: 18,
+                        spreadRadius: 2,
+                      ),
+                    ],
                   ),
                   padding: const EdgeInsets.all(30),
                   child: Icon(
@@ -36,7 +43,7 @@ class WelcomeScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
+                    color: AppColors.text,
                     letterSpacing: 2,
                   ),
                 ),
@@ -45,12 +52,11 @@ class WelcomeScreen extends StatelessWidget {
                   'أرسل دعواتك بذكاء وسهولة.',
                   style: TextStyle(
                     fontSize: 17,
-                    color: Colors.grey.shade700,
+                    color: AppColors.text.withOpacity(0.7),
                     fontWeight: FontWeight.w400,
                   ),
                 ),
                 const SizedBox(height: 50),
-
                 // زر تسجيل دخول
                 CustomButton(
                   label: 'تسجيل دخول',
@@ -59,7 +65,6 @@ class WelcomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 18),
-
                 // زر إنشاء حساب
                 CustomButton(
                   label: 'إنشاء حساب جديد',
@@ -69,7 +74,6 @@ class WelcomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 18),
-
                 // زر أمني فعالية
                 CustomButton(
                   label: 'أمني فعالية',
@@ -79,11 +83,13 @@ class WelcomeScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 60),
-
                 // حقوق أو نص سفلي صغير
                 Text(
                   'كل الحقوق محفوظة © ${DateTime.now().year}',
-                  style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+                  style: TextStyle(
+                    color: AppColors.text.withOpacity(0.4),
+                    fontSize: 13,
+                  ),
                 ),
               ],
             ),
