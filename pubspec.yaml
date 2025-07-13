@@ -1,8 +1,6 @@
 name: qr_ksa
-
 description: "A new Flutter project."
-
-publish_to: "none"
+publish_to: "none" # يمنع النشر على pub.dev
 
 version: 1.0.0+1
 
@@ -15,26 +13,30 @@ dependencies:
   qr_flutter: ^4.1.0
   cupertino_icons: ^1.0.8
   qr_code_scanner: ^1.0.1
+  font_awesome_flutter: ^10.8.0
   flutter_bloc: ^9.1.1
   equatable: ^2.0.7
-  font_awesome_flutter: ^10.8.0
-  hugeicons: ^0.0.11
+  file_picker: ^10.2.0
+  intl: ^0.20.2
+  permission_handler: ^12.0.1
+  flutter_contacts: ^1.1.9+2
+  flutter_localizations:
+    sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/riyadh1.png
-    - assets/images/riyadh2.png
-    - assets/images/riyadh3.png
+    - assets/images/
 
   fonts:
     - family: Rubik
       fonts:
+        - asset: assets/fonts/Rubik-Regular.ttf
         - asset: assets/fonts/Rubik-Bold.ttf
-          weight: 400
+          weight: 700
