@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.qr_ksa"
+    namespace = "com.example.events"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -22,7 +22,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.qr_ksa"
+        applicationId = "com.example.events"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

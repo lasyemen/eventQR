@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../core/constants.dart';
+import '../core/contacts_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _requestPermissions() async {
     await Permission.camera.request();
-    await Permission.contacts.request();
+    await ContactsService.requestContactsPermission();
     // يمكنك أيضاً طلب صلاحية الصور لو تحتاج:
     // await Permission.photos.request();
   }
