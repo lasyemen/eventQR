@@ -17,48 +17,77 @@ class CustomButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
-      child: isOutlined
-          ? OutlinedButton.icon(
-              icon: icon != null
-                  ? Icon(icon, color: AppColors.primary)
-                  : SizedBox.shrink(),
-              label: Text(
-                label,
-                style: TextStyle(color: AppColors.primary, fontSize: 18),
-              ),
-              style: OutlinedButton.styleFrom(
-                side: BorderSide(color: AppColors.primary, width: 2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                backgroundColor: AppColors.background,
-              ),
-              onPressed: onPressed,
-            )
-          : ElevatedButton.icon(
-              icon: icon != null
-                  ? Icon(icon, color: AppColors.background)
-                  : SizedBox.shrink(),
-              label: Text(
-                label,
-                style: TextStyle(
-                  color: AppColors.background,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                elevation: 2,
-              ),
-              onPressed: onPressed,
-            ),
+    final borderRadius = BorderRadius.circular(16);
+
+    // محتوى الزر (الأيقونة + النص)
+    Widget child = Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (icon != null)
+          Icon(
+            icon,
+            color: isOutlined ? AppColors.primary : Colors.white,
+            size: 21,
+          ),
+        if (icon != null) const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(
+            color: isOutlined ? AppColors.primary : Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
     );
+
+    if (isOutlined) {
+      // Outlined button مع حدود متدرجة
+      return GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            // الطبقة الأولى: حدود متدرجة
+            gradient: AppColors.primaryGradient,
+          ),
+          padding: const EdgeInsets.all(2), // سماكة الحد المتدرج
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 13),
+            decoration: BoxDecoration(
+              borderRadius: borderRadius,
+              // الطبقة الثانية: خلفية الزر (أبيض أو خلفية شفافة)
+              // ممكن تغيرها حسب ما تحب
+              color: AppColors.background,
+            ),
+            child: child,
+          ),
+        ),
+      );
+    } else {
+      // زر عادي (ممتلئ متدرج)
+      return GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          decoration: BoxDecoration(
+            borderRadius: borderRadius,
+            gradient: AppColors.primaryGradient,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.13),
+                blurRadius: 10,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      );
+    }
   }
 }

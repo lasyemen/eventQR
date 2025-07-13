@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../core/constants.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -12,10 +13,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _requestPermissions(); // اطلب الصلاحيات هنا!
     Future.delayed(const Duration(seconds: 2), () {
-      // انتقل لشاشة الترحيب (welcome) بعد 2 ثانية
       Navigator.pushReplacementNamed(context, '/welcome');
     });
+  }
+
+  Future<void> _requestPermissions() async {
+    await Permission.camera.request();
+    await Permission.contacts.request();
+    // يمكنك أيضاً طلب صلاحية الصور لو تحتاج:
+    // await Permission.photos.request();
   }
 
   @override
@@ -26,7 +34,6 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // لوجو بسيط أو أيقونة QR
             Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -40,7 +47,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 30),
-            // اسم التطبيق
             Text(
               'دعوة QR',
               style: TextStyle(
@@ -60,7 +66,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 90),
-            // تحميل متحرك عصري
             CircularProgressIndicator(
               color: AppColors.primary,
               strokeWidth: 2.5,
