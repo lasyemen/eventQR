@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:qr_ksa/core/constants.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> initSupabase() async {
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+}
+
+SupabaseClient get supabase => Supabase.instance.client;
 
 void showCustomSnackbar(BuildContext context, String message, {Color? color}) {
   ScaffoldMessenger.of(context).showSnackBar(

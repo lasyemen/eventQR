@@ -78,3 +78,7 @@ class AppFonts {
 class AppBorders {
   static const double radius = 14;
 }
+
+const String supabaseUrl = 'https://vfajkxdyzwdnurfnaqdy.supabase.co';
+const String supabaseAnonKey =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmYWpreGR5endkbnVyZm5hcWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2ODg4NDMsImV4cCI6MjA2ODI2NDg0M30.TR1P5OaEMC7pUTpekzQXi_mgh1_DAr6QAhiyff_MIeo';

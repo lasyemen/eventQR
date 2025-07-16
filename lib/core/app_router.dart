@@ -11,6 +11,8 @@ import 'package:qr_ksa/screens/signup_screen.dart';
 import 'package:qr_ksa/screens/attendance_list_screen.dart';
 import 'package:qr_ksa/screens/create_event_screen.dart';
 import 'package:qr_ksa/screens/payment_screen.dart';
+import 'package:qr_ksa/screens/create_company_event_screen.dart';
+import 'package:qr_ksa/screens/plans_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -32,8 +34,7 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => AttendanceListScreen());
       case '/create-event':
         return MaterialPageRoute(builder: (_) => const CreateEventScreen());
-      case '/payment':
-        return MaterialPageRoute(builder: (_) => const PaymentScreen());
+
       case '/profile':
         return MaterialPageRoute(builder: (_) => const EventSecurityScreen());
       case '/otp':
@@ -46,6 +47,14 @@ class AppRouter {
         );
       case '/event-security-dashboard':
         return MaterialPageRoute(builder: (_) => const EventSecurityScreen());
+      case '/create-company-event':
+        return MaterialPageRoute(
+          builder: (_) => const CreateCompanyEventScreen(),
+        );
+      case '/plans':
+        return MaterialPageRoute(
+          builder: (_) => const PlansScreen(planType: null),
+        );
       default:
         return MaterialPageRoute(
           builder: (_) =>

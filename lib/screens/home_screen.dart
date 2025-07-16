@@ -16,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 1; // default to Home
   final String userName = 'لؤي';
-  late final ScrollController _scrollController;
 
   static const List<Map<String, String>> publicEvents = [
     {
@@ -44,23 +43,10 @@ class _HomeScreenState extends State<HomeScreen> {
     {'title': 'لقاء الـ BLoC', 'date': '25 يوليو 2025', 'location': 'جدة'},
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController()..addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
   void _onItemTapped(int idx) => setState(() => _selectedIndex = idx);
 
-  Widget _buildScrollableContent() {
-    return SingleChildScrollView(
-      controller: _scrollController,
+  Widget _buildNonScrollableContent() {
+    return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 8),
           SizedBox(
-            height: 230,
+            height: 250, // Reduced height to fit better
             child: PageView.builder(
               controller: PageController(viewportFraction: 1.0),
               itemCount: publicEvents.length,
@@ -117,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               e['title']!,
                               style: const TextStyle(
                                 fontFamily: 'Rubik',
-                                fontSize: 22,
+                                fontSize: 20, // Slightly smaller
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -140,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16), // Reduced spacing
           Row(
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,71 +161,71 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 8),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: myEvents.length,
-            itemBuilder: (_, i) {
-              final ev = myEvents[i];
-              return Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                elevation: 2,
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
+          Expanded(
+            child: ListView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: myEvents.length,
+              itemBuilder: (_, i) {
+                final ev = myEvents[i];
+                return Card(
+                  shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
                   ),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                  elevation: 2,
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 6,
+                  ), // Reduced margin
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(18),
                     ),
-                    title: Text(
-                      ev['title']!,
-                      style: const TextStyle(
-                        fontFamily: 'Rubik',
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 18,
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 6, // Reduced padding
                       ),
-                      textAlign: TextAlign.right,
-                    ),
-                    subtitle: Text(
-                      '${ev['date']} - ${ev['location']}',
-                      style: const TextStyle(
-                        fontFamily: 'Rubik',
-                        color: Colors.white70,
-                        fontSize: 12,
+                      title: Text(
+                        ev['title']!,
+                        style: const TextStyle(
+                          fontFamily: 'Rubik',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          fontSize: 16, // Slightly smaller
+                        ),
+                        textAlign: TextAlign.right,
                       ),
-                      textAlign: TextAlign.right,
+                      subtitle: Text(
+                        '${ev['date']} - ${ev['location']}',
+                        style: const TextStyle(
+                          fontFamily: 'Rubik',
+                          color: Colors.white70,
+                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                      trailing: ShaderMask(
+                        shaderCallback: (bounds) =>
+                            AppColors.primaryGradient.createShader(
+                              Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+                            ),
+                        blendMode: BlendMode.srcIn,
+                        child: const FaIcon(FontAwesomeIcons.chevronLeft),
+                      ),
+                      onTap: () {},
                     ),
-                    trailing: ShaderMask(
-                      shaderCallback: (bounds) =>
-                          AppColors.primaryGradient.createShader(
-                            Rect.fromLTWH(0, 0, bounds.width, bounds.height),
-                          ),
-                      blendMode: BlendMode.srcIn,
-                      child: const FaIcon(FontAwesomeIcons.chevronLeft),
-                    ),
-                    onTap: () {},
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-          const SizedBox(height: 16),
         ],
       ),
     );
   }
 
   Widget _buildCreateEventCard() {
-    const double trigger = 270 + 24;
-    final bool showShadow =
-        _scrollController.hasClients && _scrollController.offset > trigger;
+    const bool showShadow = false; // No scroll, so no shadow effect
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -307,7 +293,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => Navigator.pushNamed(context, '/create-event'),
+                onTap: () => Navigator.pushNamed(context, '/plans'),
                 child: const Padding(
                   padding: EdgeInsets.all(12),
                   child: Icon(Icons.add, size: 32, color: Colors.white),
@@ -384,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: _selectedIndex == 1
             ? Column(
                 children: [
-                  Expanded(child: _buildScrollableContent()),
+                  Expanded(child: _buildNonScrollableContent()),
                   _buildCreateEventCard(),
                 ],
               )

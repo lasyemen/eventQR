@@ -105,7 +105,7 @@ class PlansScreen extends StatelessWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          // TODO: Hook up purchase flow
+                          Navigator.pushNamed(context, '/create-event');
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -223,7 +223,7 @@ class PlansScreen extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        // TODO: Hook up purchase flow
+                        Navigator.pushNamed(context, '/create-company-event');
                       },
                       child: const Padding(
                         padding: EdgeInsets.symmetric(

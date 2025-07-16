@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'event_review_screen.dart';
 
 class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({Key? key}) : super(key: key);
+  final Map<String, dynamic> eventData;
+  final List attendees;
+  const PaymentScreen({
+    Key? key,
+    required this.eventData,
+    required this.attendees,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +35,12 @@ class PaymentScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => EventReviewScreen()),
+                MaterialPageRoute(
+                  builder: (_) => EventReviewScreen(
+                    eventData: eventData,
+                    attendees: attendees,
+                  ),
+                ),
               );
             },
             child: const Text('التالي: مراجعة التفاصيل'),

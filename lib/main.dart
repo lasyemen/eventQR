@@ -3,9 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/app_router.dart';
+import 'core/utils.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Supabase
+  await initSupabase();
 
   // تهيئة دعم التواريخ العربية
   await initializeDateFormatting('ar_SA', null);
