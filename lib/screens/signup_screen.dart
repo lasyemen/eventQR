@@ -69,7 +69,7 @@ class _SignUpScreenState extends State<SignUpScreen>
             );
           } else if (state.status == SignupStatus.failure) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.errorMessage ?? 'حدث خطأ')),
+              SnackBar(content: Text(state.errorMessage ?? 'لم يتم الحفظ!')),
             );
           }
         },
@@ -332,11 +332,13 @@ class _SignUpScreenState extends State<SignUpScreen>
                     return state.status == SignupStatus.loading
                         ? Container(
                             color: Colors.black26,
-                            child: const Center(child: CircularProgressIndicator()),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
                           )
                         : const SizedBox.shrink();
                   },
-                  ),
+                ),
               ],
             ),
           ),

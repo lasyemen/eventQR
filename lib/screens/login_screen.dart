@@ -12,12 +12,19 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-  final _focusNode = FocusNode();
-  String _phone = '';
-  bool _isLoading = false;
   late AnimationController _controller;
+  final _focusNode = FocusNode();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  String _phone = '';
   late Animation<double> _scaleAnimation;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -32,19 +39,14 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _login() {
+  void _login() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       setState(() => _isLoading = true);
 
-      Future.delayed(const Duration(seconds: 2), () {
+      try {
+        // Simulate API call
+        await Future.delayed(const Duration(seconds: 2));
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم إرسال رمز التحقق بنجاح!')),
@@ -54,7 +56,14 @@ class _LoginScreenState extends State<LoginScreen>
           '/otp',
           arguments: {'phoneNumber': '+966$_phone'},
         );
-      });
+      } catch (e) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('لم يتم الحفظ!'),
+          ), // Failure notification
+        );
+      }
     }
   }
 

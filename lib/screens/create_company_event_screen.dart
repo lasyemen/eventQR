@@ -34,18 +34,17 @@ Future<String?> _uploadImageToSupabase(File imageFile) async {
   try {
     final fileName =
         '${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
+    // Upload to 'Images' folder inside 'images' bucket
+    final storagePath = 'Images/$fileName';
     final response = await supabase.storage
         .from('images')
-        .upload(fileName, imageFile);
+        .upload(storagePath, imageFile);
     if (response.isEmpty) {
-      print('[uploadImageToSupabase] Upload failed: empty response');
       return null;
     }
-    final publicUrl = supabase.storage.from('images').getPublicUrl(fileName);
-    print('[uploadImageToSupabase] Uploaded: $publicUrl');
+    final publicUrl = supabase.storage.from('images').getPublicUrl(storagePath);
     return publicUrl;
   } catch (e, st) {
-    print('[uploadImageToSupabase] ERROR: $e\n$st');
     return null;
   }
 }
@@ -69,7 +68,9 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
   final TextEditingController _dateTimeController = TextEditingController();
   DateTime? _selectedDateTime;
   File? _eventImage;
+  String? _uploadedImageUrl; // Store the uploaded image URL
   bool _isImageLoading = false;
+  bool _isOrgLoading = false;
 
   @override
   void dispose() {
@@ -279,12 +280,10 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
         source: ImageSource.gallery,
         imageQuality: 70,
       );
-      print('[pickImage] Picked: ${picked?.path}');
       if (picked != null) {
         final docsDir = await getApplicationDocumentsDirectory();
         final targetPath =
             '${docsDir.path}/${DateTime.now().millisecondsSinceEpoch}_event.jpg';
-        print('[pickImage] Target path: $targetPath');
         final compressed = await compute(compressImageIsolate, {
           'path': picked.path,
           'targetPath': targetPath,
@@ -292,7 +291,6 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
           'minWidth': 400,
           'minHeight': 250,
         });
-        print('[pickImage] Compressed: $compressed');
         File? finalImage;
         if (compressed is File) {
           finalImage = compressed;
@@ -305,35 +303,94 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
           _eventImage = finalImage;
           _isImageLoading = false;
         });
-        // Upload to Supabase
+        // Upload to Supabase and store the URL
         if (finalImage != null) {
           final url = await _uploadImageToSupabase(finalImage);
           if (url != null) {
-            print('[pickImage] Image uploaded to: $url');
+            setState(() {
+              _uploadedImageUrl = url;
+            });
             if (mounted) {
               showCustomSnackbar(context, 'تم رفع صورة الفعالية بنجاح');
             }
+          } else {
+            setState(() {
+              _uploadedImageUrl = null;
+            });
+            showCustomSnackbar(context, 'فشل رفع صورة الفعالية!');
           }
         }
       } else {
         setState(() => _isImageLoading = false);
       }
     } catch (e, st) {
-      print('[pickImage] ERROR: $e\n$st');
       setState(() => _isImageLoading = false);
+      showCustomSnackbar(context, 'حدث خطأ أثناء رفع الصورة');
     }
   }
 
-  void _submit() {
+  Future<int?> _getOrCreateOrganization(String orgName) async {
+    setState(() => _isOrgLoading = true);
+    final client = supabase;
+    // Try to find existing org
+    final existing = await client
+        .from('organizations')
+        .select()
+        .eq('name', orgName)
+        .maybeSingle();
+    if (existing != null && existing['id'] != null) {
+      setState(() => _isOrgLoading = false);
+      return existing['id'] as int;
+    }
+    // Insert new org
+    final inserted = await client
+        .from('organizations')
+        .insert({'name': orgName})
+        .select()
+        .maybeSingle();
+    setState(() => _isOrgLoading = false);
+    if (inserted != null && inserted['id'] != null) {
+      return inserted['id'] as int;
+    }
+    return null;
+  }
+
+  void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
+      // Ensure image is uploaded if selected
+      if (_eventImage != null && _uploadedImageUrl == null) {
+        showCustomSnackbar(context, 'جاري رفع صورة الفعالية...');
+        final url = await _uploadImageToSupabase(_eventImage!);
+        if (url == null) {
+          showCustomSnackbar(context, 'فشل رفع صورة الفعالية!');
+          return;
+        }
+        setState(() {
+          _uploadedImageUrl = url;
+        });
+      }
+      // Create or get organization with loading dialog
+      final orgName = _orgNameController.text.trim();
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+      final orgId = await _getOrCreateOrganization(orgName);
+      Navigator.of(context, rootNavigator: true).pop(); // Dismiss dialog
+      if (orgId == null) {
+        showCustomSnackbar(context, 'فشل حفظ المنظمة!');
+        return;
+      }
       final eventInfo = {
-        'orgName': _orgNameController.text.trim(),
+        'organization_id': orgId,
+        'orgName': orgName,
         'eventName': _eventNameController.text.trim(),
         'desc': _descController.text.trim(),
         'location': _locationController.text.trim(),
         'contact': _contactController.text.trim(),
         'dateTime': _selectedDateTime?.toIso8601String(),
-        'imagePath': _eventImage?.path,
+        'imageUrl': _uploadedImageUrl,
       };
       if (mounted) {
         showCustomSnackbar(context, 'تم حفظ معلومات الفعالية بنجاح');

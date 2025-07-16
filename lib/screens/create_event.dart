@@ -48,24 +48,32 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // TODO: send data to backend or state management
-      final title = _titleController.text.trim();
-      final description = _descriptionController.text.trim();
-      final location = _locationController.text.trim();
-      final dateTime = DateTime(
-        _selectedDate!.year,
-        _selectedDate!.month,
-        _selectedDate!.day,
-        _selectedTime!.hour,
-        _selectedTime!.minute,
-      );
-
-      // Example printing
-      debugPrint('New Event: $title at $location on $dateTime');
-
-      Navigator.of(context).pop();
+      try {
+        // Simulate API call
+        final title = _titleController.text.trim();
+        final description = _descriptionController.text.trim();
+        final location = _locationController.text.trim();
+        final dateTime = DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          _selectedDate!.day,
+          _selectedTime!.hour,
+          _selectedTime!.minute,
+        );
+        await Future.delayed(const Duration(milliseconds: 600));
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('تم الحفظ بنجاح!')));
+        Navigator.of(context).pop();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('لم يتم الحفظ!')));
+      }
     }
   }
 

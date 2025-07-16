@@ -6,6 +6,8 @@ import 'package:qr_ksa/core/constants.dart';
 import 'package:qr_ksa/widgets/custom_button.dart';
 import 'package:qr_ksa/screens/select_attendees_screen.dart';
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
+import 'dart:io';
 
 class CreateEventScreen extends StatefulWidget {
   const CreateEventScreen({Key? key}) : super(key: key);
@@ -129,14 +131,54 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         _selectedDate != null &&
         _selectedTime != null) {
       setState(() => _isSubmitting = true);
-      // محاكاة تأخير المعالجة
-      await Future.delayed(const Duration(milliseconds: 600));
-      if (!mounted) return;
-      // الانتقال إلى شاشة اختيار الحضور بعد نجاح التحقق من المدخلات
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => const SelectAttendeesScreen()));
-      setState(() => _isSubmitting = false);
+      try {
+        final uri = Uri.parse(
+          'https://vfajkxdyzwdnurfnaqdy.supabase.co',
+        ); // <-- Replace with your real endpoint
+        final request = http.MultipartRequest('POST', uri);
+        request.fields['name'] = _nameController.text.trim();
+        request.fields['location'] = _locationController.text.trim();
+        final dateTime = DateTime(
+          _selectedDate!.year,
+          _selectedDate!.month,
+          _selectedDate!.day,
+          _selectedTime!.hour,
+          _selectedTime!.minute,
+        );
+        request.fields['date_time'] = dateTime.toIso8601String();
+        // Add image if picked
+        if (_pickedFile != null && _pickedFile!.path != null) {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'image',
+              _pickedFile!.path!,
+              filename: _pickedFile!.name,
+            ),
+          );
+        }
+        final streamedResponse = await request.send();
+        final response = await http.Response.fromStream(streamedResponse);
+        if (!mounted) return;
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('تم الحفظ بنجاح!')));
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const SelectAttendeesScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('لم يتم الحفظ! (${response.statusCode})')),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('لم يتم الحفظ! ($e)')));
+      } finally {
+        if (mounted) setState(() => _isSubmitting = false);
+      }
     }
   }
 
