@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
-import '../core/constants.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/constants.dart';
+import '../../../widgets/custom_button.dart';
 import 'select_attendees_screen.dart';
 import 'event_review_screen.dart';
 

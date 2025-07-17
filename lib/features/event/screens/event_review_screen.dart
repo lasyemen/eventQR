@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'send_invitation_screen.dart';
-import '../core/constants.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/constants.dart';
 import 'dart:ui' as ui;
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'payment_screen.dart';
 import 'organizer_payment_screen.dart';
+import '../../../widgets/custom_button.dart';
 
 class EventReviewScreen extends StatelessWidget {
   final Map<String, dynamic> eventData;

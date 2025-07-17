@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../core/constants.dart';
-import '../core/contacts_service.dart';
+import '../../../core/constants.dart';
+import '../../../core/contacts_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);

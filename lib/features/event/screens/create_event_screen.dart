@@ -3,8 +3,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart'; // تم التأكد من إضافة التوطين
 import 'package:qr_ksa/core/constants.dart';
-import 'package:qr_ksa/widgets/custom_button.dart';
-import 'package:qr_ksa/screens/select_attendees_screen.dart';
+import '../../../widgets/custom_button.dart';
+import 'select_attendees_screen.dart';
 import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'dart:io';

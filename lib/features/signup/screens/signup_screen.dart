@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/signup/signup_bloc.dart';
-import '../bloc/signup/signup_event.dart';
-import '../bloc/signup/signup_state.dart';
-import '../core/constants.dart';
-import '../widgets/custom_button.dart';
+import '../bloc/signup_bloc.dart';
+import '../bloc/signup_event.dart';
+import '../bloc/signup_state.dart';
+import '../../../core/constants.dart';
+import '../../../widgets/custom_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);

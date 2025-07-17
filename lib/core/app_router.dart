@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:qr_ksa/screens/event_security_screen.dart';
-import 'package:qr_ksa/screens/home_screen.dart';
-import 'package:qr_ksa/screens/login_event_security_screen.dart';
-import 'package:qr_ksa/screens/otp_screen.dart';
-import 'package:qr_ksa/screens/scan_qr_screen.dart';
-import 'package:qr_ksa/screens/splash_screen.dart';
-import 'package:qr_ksa/screens/welcome_screen.dart';
-import 'package:qr_ksa/screens/login_screen.dart';
-import 'package:qr_ksa/screens/signup_screen.dart';
-import 'package:qr_ksa/screens/attendance_list_screen.dart';
-import 'package:qr_ksa/screens/create_event_screen.dart';
-import 'package:qr_ksa/screens/payment_screen.dart';
-import 'package:qr_ksa/screens/create_company_event_screen.dart';
-import 'package:qr_ksa/screens/plans_screen.dart';
+import 'package:qr_ksa/features/event/screens/event_security_screen.dart';
+import 'package:qr_ksa/features/home/screens/home_screen.dart';
+import 'package:qr_ksa/features/event/screens/login_event_security_screen.dart';
+import 'package:qr_ksa/features/login/screens/otp_screen.dart';
+import 'package:qr_ksa/features/event/screens/scan_qr_screen.dart';
+import 'package:qr_ksa/features/home/screens/splash_screen.dart';
+import 'package:qr_ksa/features/home/screens/welcome_screen.dart';
+import 'package:qr_ksa/features/login/screens/login_screen.dart';
+import 'package:qr_ksa/features/signup/screens/signup_screen.dart';
+import 'package:qr_ksa/features/event/screens/attendance_list_screen.dart';
+import 'package:qr_ksa/features/event/screens/create_event_screen.dart';
+import 'package:qr_ksa/features/event/screens/payment_screen.dart';
+import 'package:qr_ksa/features/home/screens/create_company_event_screen.dart';
+import 'package:qr_ksa/features/home/screens/plans_screen.dart';
 
 class AppRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {

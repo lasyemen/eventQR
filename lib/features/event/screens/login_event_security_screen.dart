@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../core/constants.dart';
-import '../widgets/custom_button.dart';
+import '../../../core/constants.dart';
+import '../../../widgets/custom_button.dart';
 
 class LoginEventSecurityScreen extends StatefulWidget {
   const LoginEventSecurityScreen({Key? key}) : super(key: key);

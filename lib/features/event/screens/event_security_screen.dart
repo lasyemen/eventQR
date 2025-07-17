@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../core/constants.dart'; // لـ AppColors.primaryGradient
+import '../../../core/constants.dart'; // لـ AppColors.primaryGradient
 import 'scan_qr_screen.dart';
 // **لا تستورد attendance_list_screen هنا**
 

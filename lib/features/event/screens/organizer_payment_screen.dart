@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../core/constants.dart';
-import 'payment_success_screen.dart';
+import '../../../core/constants.dart';
+import '../../home/screens/payment_success_screen.dart';
 
 class OrganizerPaymentScreen extends StatefulWidget {
   final Map<String, dynamic> eventData;

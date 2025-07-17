@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../core/constants.dart';
-import '../widgets/custom_button.dart';
-import 'home_screen.dart';
+import '../../../core/constants.dart';
+import '../../../widgets/custom_button.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -61,7 +60,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _verifyOtp() {
-    Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    // Removed Navigator.pushReplacementNamed(context, HomeScreen.routeName);
   }
 
   void _clearAll() {

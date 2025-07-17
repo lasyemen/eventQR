@@ -1,7 +1,7 @@
 // lib/screens/plans_screen.dart
 
 import 'package:flutter/material.dart';
-import '../core/constants.dart'; // AppColors.primaryGradient
+import '../../../core/constants.dart'; // AppColors.primaryGradient
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 /// Screen to display both personal and corporate subscription plans
