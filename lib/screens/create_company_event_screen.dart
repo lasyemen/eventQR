@@ -8,46 +8,9 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:flutter/foundation.dart'; // for compute
+import 'package:flutter/foundation.dart';
 import '../core/utils.dart';
-
-// Helper function for isolate (must be top-level)
-Future<dynamic> compressImageIsolate(Map<String, dynamic> params) async {
-  try {
-    print('[compressImageIsolate] params: ' + params.toString());
-    final result = await FlutterImageCompress.compressAndGetFile(
-      params['path'],
-      params['targetPath'],
-      quality: params['quality'],
-      minWidth: params['minWidth'],
-      minHeight: params['minHeight'],
-    );
-    print('[compressImageIsolate] result: ' + result.toString());
-    return result;
-  } catch (e, st) {
-    print('[compressImageIsolate] ERROR: $e\n$st');
-    return null;
-  }
-}
-
-Future<String?> _uploadImageToSupabase(File imageFile) async {
-  try {
-    final fileName =
-        '${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
-    // Upload to 'Images' folder inside 'images' bucket
-    final storagePath = 'Images/$fileName';
-    final response = await supabase.storage
-        .from('images')
-        .upload(storagePath, imageFile);
-    if (response.isEmpty) {
-      return null;
-    }
-    final publicUrl = supabase.storage.from('images').getPublicUrl(storagePath);
-    return publicUrl;
-  } catch (e, st) {
-    return null;
-  }
-}
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreateCompanyEventScreen extends StatefulWidget {
   static const routeName = '/create-company-event';
@@ -68,9 +31,7 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
   final TextEditingController _dateTimeController = TextEditingController();
   DateTime? _selectedDateTime;
   File? _eventImage;
-  String? _uploadedImageUrl; // Store the uploaded image URL
   bool _isImageLoading = false;
-  bool _isOrgLoading = false;
 
   @override
   void dispose() {
@@ -83,6 +44,106 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
     super.dispose();
   }
 
+  // عزل ضغط الصورة في isolate
+  static Future<dynamic> compressImageIsolate(
+    Map<String, dynamic> params,
+  ) async {
+    try {
+      final result = await FlutterImageCompress.compressAndGetFile(
+        params['path'],
+        params['targetPath'],
+        quality: params['quality'],
+        minWidth: params['minWidth'],
+        minHeight: params['minHeight'],
+      );
+      return result;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // رفع الصورة إلى supabase storage
+  Future<String?> _uploadImageToSupabase(File imageFile) async {
+    try {
+      final fileName =
+          '${DateTime.now().millisecondsSinceEpoch}_${imageFile.path.split('/').last}';
+      final response = await Supabase.instance.client.storage
+          .from('images')
+          .upload(fileName, imageFile);
+      if (response.isEmpty) return null;
+      final publicUrl = Supabase.instance.client.storage
+          .from('images')
+          .getPublicUrl(fileName);
+      return publicUrl;
+    } catch (e, st) {
+      print('[uploadImageToSupabase] ERROR: $e\n$st');
+      return null;
+    }
+  }
+
+  // رفع بيانات الفعالية لقاعدة البيانات
+  Future<bool> addCompanyEvent(Map<String, dynamic> event) async {
+    try {
+      await Supabase.instance.client
+          .from('company_events')
+          .insert(event)
+          .select();
+      return true;
+    } catch (e) {
+      print('Error inserting event: $e');
+      return false;
+    }
+  }
+
+  // Pick Image
+  Future<void> _pickImage() async {
+    setState(() => _isImageLoading = true);
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+      );
+      if (picked != null) {
+        final docsDir = await getApplicationDocumentsDirectory();
+        final targetPath =
+            '${docsDir.path}/${DateTime.now().millisecondsSinceEpoch}_event.jpg';
+        final compressed = await compute(compressImageIsolate, {
+          'path': picked.path,
+          'targetPath': targetPath,
+          'quality': 60,
+          'minWidth': 400,
+          'minHeight': 250,
+        });
+        File? finalImage;
+        if (compressed is File) {
+          finalImage = compressed;
+        } else if (compressed is XFile) {
+          finalImage = File(compressed.path);
+        } else {
+          finalImage = File(picked.path);
+        }
+        setState(() {
+          _eventImage = finalImage;
+          _isImageLoading = false;
+        });
+        // رفع للصورة مباشرة بعد الاختيار
+        if (finalImage != null) {
+          final url = await _uploadImageToSupabase(finalImage);
+          if (url != null && mounted) {
+            showCustomSnackbar(context, 'تم رفع صورة الفعالية بنجاح');
+          }
+        }
+      } else {
+        setState(() => _isImageLoading = false);
+      }
+    } catch (e, st) {
+      print('[pickImage] ERROR: $e\n$st');
+      setState(() => _isImageLoading = false);
+    }
+  }
+
+  // Pick Date & Time
   Future<void> _pickDateTime() async {
     final now = DateTime.now();
     try {
@@ -108,7 +169,6 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
             ),
             child: Builder(
               builder: (context) {
-                // Custom header with gradient
                 return Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -169,7 +229,7 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
         }
       }
     } catch (e) {
-      // Fallback: try again without locale if error
+      // fallback
       final date = await showDatePicker(
         context: context,
         initialDate: now,
@@ -205,7 +265,6 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
     }
   }
 
-  // Add a separate _pickTime method
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
@@ -272,136 +331,41 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
-    setState(() => _isImageLoading = true);
-    try {
-      final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 70,
-      );
-      if (picked != null) {
-        final docsDir = await getApplicationDocumentsDirectory();
-        final targetPath =
-            '${docsDir.path}/${DateTime.now().millisecondsSinceEpoch}_event.jpg';
-        final compressed = await compute(compressImageIsolate, {
-          'path': picked.path,
-          'targetPath': targetPath,
-          'quality': 60,
-          'minWidth': 400,
-          'minHeight': 250,
-        });
-        File? finalImage;
-        if (compressed is File) {
-          finalImage = compressed;
-        } else if (compressed is XFile) {
-          finalImage = File(compressed.path);
-        } else {
-          finalImage = File(picked.path);
-        }
-        setState(() {
-          _eventImage = finalImage;
-          _isImageLoading = false;
-        });
-        // Upload to Supabase and store the URL
-        if (finalImage != null) {
-          final url = await _uploadImageToSupabase(finalImage);
-          if (url != null) {
-            setState(() {
-              _uploadedImageUrl = url;
-            });
-            if (mounted) {
-              showCustomSnackbar(context, 'تم رفع صورة الفعالية بنجاح');
-            }
-          } else {
-            setState(() {
-              _uploadedImageUrl = null;
-            });
-            showCustomSnackbar(context, 'فشل رفع صورة الفعالية!');
-          }
-        }
-      } else {
-        setState(() => _isImageLoading = false);
-      }
-    } catch (e, st) {
-      setState(() => _isImageLoading = false);
-      showCustomSnackbar(context, 'حدث خطأ أثناء رفع الصورة');
-    }
-  }
-
-  Future<int?> _getOrCreateOrganization(String orgName) async {
-    setState(() => _isOrgLoading = true);
-    final client = supabase;
-    // Try to find existing org
-    final existing = await client
-        .from('organizations')
-        .select()
-        .eq('name', orgName)
-        .maybeSingle();
-    if (existing != null && existing['id'] != null) {
-      setState(() => _isOrgLoading = false);
-      return existing['id'] as int;
-    }
-    // Insert new org
-    final inserted = await client
-        .from('organizations')
-        .insert({'name': orgName})
-        .select()
-        .maybeSingle();
-    setState(() => _isOrgLoading = false);
-    if (inserted != null && inserted['id'] != null) {
-      return inserted['id'] as int;
-    }
-    return null;
-  }
-
+  // رفع البيانات عند الضغط على زر التالي
   void _submit() async {
     if (_formKey.currentState?.validate() ?? false) {
-      // Ensure image is uploaded if selected
-      if (_eventImage != null && _uploadedImageUrl == null) {
-        showCustomSnackbar(context, 'جاري رفع صورة الفعالية...');
-        final url = await _uploadImageToSupabase(_eventImage!);
-        if (url == null) {
-          showCustomSnackbar(context, 'فشل رفع صورة الفعالية!');
-          return;
-        }
-        setState(() {
-          _uploadedImageUrl = url;
-        });
-      }
-      // Create or get organization with loading dialog
-      final orgName = _orgNameController.text.trim();
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => const Center(child: CircularProgressIndicator()),
-      );
-      final orgId = await _getOrCreateOrganization(orgName);
-      Navigator.of(context, rootNavigator: true).pop(); // Dismiss dialog
-      if (orgId == null) {
-        showCustomSnackbar(context, 'فشل حفظ المنظمة!');
-        return;
-      }
+      // تجهيز بيانات الفعالية
       final eventInfo = {
-        'organization_id': orgId,
-        'orgName': orgName,
-        'eventName': _eventNameController.text.trim(),
-        'desc': _descController.text.trim(),
+        'org_name': _orgNameController.text.trim(),
+        'event_name': _eventNameController.text.trim(),
+        'description': _descController.text.trim(),
         'location': _locationController.text.trim(),
         'contact': _contactController.text.trim(),
-        'dateTime': _selectedDateTime?.toIso8601String(),
-        'imageUrl': _uploadedImageUrl,
+        'datetime': _selectedDateTime?.toIso8601String(),
+        'image_url': null,
       };
-      if (mounted) {
-        showCustomSnackbar(context, 'تم حفظ معلومات الفعالية بنجاح');
+
+      // لو فيه صورة، نرفعها ونأخذ الرابط
+      if (_eventImage != null) {
+        final url = await _uploadImageToSupabase(_eventImage!);
+        if (url != null) eventInfo['image_url'] = url;
       }
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) =>
-              EventCapacityScreen(eventInfo: eventInfo, isPublicEvent: true),
-        ),
-      );
+
+      final inserted = await addCompanyEvent(eventInfo);
+
+      if (inserted && mounted) {
+        showCustomSnackbar(context, 'تم حفظ معلومات الفعالية بنجاح');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+                EventCapacityScreen(eventInfo: eventInfo, isPublicEvent: true),
+          ),
+        );
+      } else {
+        if (mounted)
+          showCustomSnackbar(context, 'فشل حفظ البيانات، حاول لاحقاً');
+      }
     }
   }
 
@@ -514,7 +478,7 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
                   ),
                   const SizedBox(height: 18),
                   const _SectionTitle('معلومات الفعالية'),
-                  const SizedBox(height: 18), // more space after the title
+                  const SizedBox(height: 18),
                   Row(
                     children: [
                       Expanded(
@@ -609,10 +573,7 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
                     },
                   ),
                   const SizedBox(height: 32),
-                  CustomButton(
-                    label: 'التالي', // change button label to Next
-                    onPressed: _submit,
-                  ),
+                  CustomButton(label: 'التالي', onPressed: _submit),
                 ],
               ),
             ),
@@ -623,7 +584,7 @@ class _CreateCompanyEventScreenState extends State<CreateCompanyEventScreen> {
   }
 }
 
-// Update the border radius in _ModernTextField and _GradientOutlinePainter
+// النص، الزر والـ Chip (نفس ما أرسلته أنت، فقط منسقة لتعمل مع الكود الجديد)
 class _ModernTextField extends StatelessWidget {
   final TextEditingController controller;
   final String label;
@@ -651,7 +612,7 @@ class _ModernTextField extends StatelessWidget {
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 13.5,
-              color: Colors.black, // back to black
+              color: Colors.black,
             ),
           ),
         ),
@@ -775,11 +736,11 @@ class _ModernChipButton extends StatelessWidget {
                         child: Text(
                           value ?? label,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: Colors.grey, // gray text
+                            color: Colors.grey,
                             fontWeight: value != null
                                 ? FontWeight.bold
                                 : FontWeight.normal,
-                            fontSize: 13.5, // reduced size
+                            fontSize: 13.5,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
