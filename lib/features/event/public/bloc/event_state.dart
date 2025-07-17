@@ -21,3 +21,13 @@ class EventError extends EventState {
   @override
   List<Object> get props => [error];
 }
+
+class EventSuccess extends EventState {}
+
+class EventFailure extends EventState {
+  final String error;
+  const EventFailure(this.error);
+
+  @override
+  List<Object> get props => [error];
+}
