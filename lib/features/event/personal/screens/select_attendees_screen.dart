@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import '../../../core/constants.dart'; // AppColors, AppFonts
-import '../../../widgets/custom_textfield.dart';
-import '../../../widgets/custom_button.dart';
+import 'package:qr_ksa/core/constants.dart';
+import 'package:qr_ksa/widgets/custom_textfield.dart';
+import 'package:qr_ksa/widgets/custom_button.dart';
 
 class ContactSelectionProvider extends ChangeNotifier {
   List<Contact> _allContacts = [];

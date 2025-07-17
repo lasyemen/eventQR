@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'event_review_screen.dart';
+import 'package:qr_ksa/features/event/public/screens/event_review_screen.dart';
 
 class PaymentScreen extends StatelessWidget {
   final Map<String, dynamic> eventData;

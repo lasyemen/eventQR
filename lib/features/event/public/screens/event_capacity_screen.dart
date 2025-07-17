@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
-import '../../../core/constants.dart';
-import '../../../widgets/custom_button.dart';
-import 'select_attendees_screen.dart';
+import 'package:qr_ksa/core/constants.dart';
+import 'package:qr_ksa/widgets/custom_button.dart';
+import '../../personal/screens/select_attendees_screen.dart';
 import 'event_review_screen.dart';
 
 class EventCapacityScreen extends StatefulWidget {

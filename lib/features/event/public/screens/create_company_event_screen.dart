@@ -1,16 +1,17 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants.dart';
-import '../../../widgets/custom_button.dart';
-import '../../event/screens/event_capacity_screen.dart';
+
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/foundation.dart';
-import '../../../core/utils.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:qr_ksa/core/constants.dart';
+import 'package:qr_ksa/widgets/custom_button.dart';
+import 'package:qr_ksa/core/utils.dart';
+import 'package:qr_ksa/features/event/public/screens/event_capacity_screen.dart';
 
 class CreateCompanyEventScreen extends StatefulWidget {
   static const routeName = '/create-company-event';

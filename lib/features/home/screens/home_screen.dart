@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../core/constants.dart'; // AppColors.primaryGradient, etc.
-import '../../event/screens/my_events_screen.dart';
+import '../../event/public/screens/my_events_screen.dart';
 import 'plans_screen.dart';
 
 class HomeScreen extends StatefulWidget {

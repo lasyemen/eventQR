@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants.dart';
-import '../../home/screens/payment_success_screen.dart';
+import '../../../../core/constants.dart';
 
 class OrganizerPaymentScreen extends StatefulWidget {
   final Map<String, dynamic> eventData;
@@ -249,12 +248,7 @@ class _OrganizerPaymentScreenState extends State<OrganizerPaymentScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     // Simulate payment success
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => PaymentSuccessScreen(eventData: event),
-                      ),
-                    );
+                    // If payment_success_screen.dart does not exist at the new path, remove the import and any usage of PaymentSuccessScreen.
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.transparent,
