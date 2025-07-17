@@ -9,9 +9,9 @@ import 'package:qr_ksa/features/home/screens/welcome_screen.dart';
 import 'package:qr_ksa/features/login/screens/login_screen.dart';
 import 'package:qr_ksa/features/signup/screens/signup_screen.dart';
 import 'package:qr_ksa/features/event/screens/attendance_list_screen.dart';
-import 'package:qr_ksa/features/event/public/screens/create_event_screen.dart';
-import 'package:qr_ksa/features/event/public/screens/payment_screen.dart';
-import 'package:qr_ksa/features/home/screens/create_company_event_screen.dart';
+import 'package:qr_ksa/features/event/personal/screens/create_event_screen.dart';
+import 'package:qr_ksa/features/event/personal/screens/payment_screen.dart';
+import 'package:qr_ksa/features/event/public/screens/create_company_event_screen.dart';
 import 'package:qr_ksa/features/home/screens/plans_screen.dart';
 
 class AppRouter {
